@@ -1,0 +1,7 @@
+{
+  "name": "dark-eliza-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serverless proxy that keeps the Gemini API key server-side for the Dark-ELIZA chat frontend.",
+  "license": "MIT"
+}
