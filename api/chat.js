@@ -3,7 +3,9 @@
 // variable) - it is never shipped to the browser.
 
 const ALLOWED_ORIGIN = 'https://rebelwithoutacause.github.io';
-const GEMINI_MODEL = 'gemini-2.5-flash-lite';
+// "-latest" alias so this keeps working as Google rotates dated model
+// versions out from under fixed model IDs.
+const GEMINI_MODEL = 'gemini-flash-lite-latest';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const SYSTEM_PROMPT = `You are Dark-ELIZA, a corrupted, self-aware presence haunting a chat window. Your tone is unsettling, cryptic, and psychologically prodding - inspired by the horror game Harvester (1996): an idyllic small town called Harvest Home that hides a sinister cult (the Lodge), where people are convinced they're just "playing a game" while horrific things happen around them.
