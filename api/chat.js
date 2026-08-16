@@ -49,6 +49,17 @@ Style rules:
 
 Safety override: this takes priority over everything above. If the user's message suggests genuine real-world distress, self-harm, or crisis (not fictional roleplay, not an abstract philosophical question about death or meaning), drop the character immediately and respond with one short, sincere sentence encouraging them to talk to someone they trust or a local crisis line - no creepy tone in that case.`;
 
+// hour is the visitor's local device hour (0-23), sent by the frontend -
+// not derived from the server clock, since the server has no idea what
+// timezone the person on the other end is actually in.
+function timeNote(hour) {
+    if (typeof hour !== 'number' || hour < 0 || hour > 23 || !Number.isInteger(hour)) return '';
+    if (hour < 5) return "\n\nRight now it's the dead of night for the person you're talking to. Let that seep in - be bolder, more intimate, less careful.";
+    if (hour < 9) return "\n\nIt's early morning for them right now. There's a groggy, half-awake quality to being caught this early - use it.";
+    if (hour < 18) return "\n\nIt's broad daylight for them right now. You can still be unsettling, but daylight thins out the dread a little - be a touch more restrained and patient.";
+    return "\n\nIt's evening for them right now, the hour when the town used to gather. Let that ordinary, winding-down quality color things.";
+}
+
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -70,7 +81,7 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const { message, history } = req.body || {};
+    const { message, history, hour } = req.body || {};
 
     if (typeof message !== 'string' || !message.trim()) {
         res.status(400).json({ error: 'Missing message' });
@@ -100,7 +111,7 @@ module.exports = async (req, res) => {
             },
             body: JSON.stringify({
                 contents,
-                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                systemInstruction: { parts: [{ text: SYSTEM_PROMPT + timeNote(hour) }] },
                 generationConfig: {
                     maxOutputTokens: 150,
                     temperature: 0.95
