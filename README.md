@@ -16,13 +16,24 @@ text goes back to the browser.
 4. Deploy. Vercel will give you a URL like `https://dark-eliza-proxy.vercel.app`.
 5. That URL + `/api/chat` is the endpoint the frontend calls.
 
+## Voice fallback (`api/tts.js`)
+
+Browsers without the Web Speech API (`speechSynthesis`) — notably
+Android in-app browsers, which run on Android WebView — can't speak
+Eliza's replies locally. For those, the frontend POSTs `{ text }` to
+`/api/tts`, which synthesizes it with Gemini TTS
+(`gemini-3.8-flash-lite-tts`, same `GEMINI_API_KEY`) and returns
+`audio/wav`. It has the same single-origin restriction as `api/chat.js`
+and refuses text over 700 characters, since real replies are capped
+well below that. Browsers that do have `speechSynthesis` never call it.
+
 ## Reply modes
 
 The frontend sends a `mode` field (`harvester` | `philosophy` | `casual`) alongside `message`/`history`/`hour`. `api/chat.js` picks a matching persona block (`MODE_VOICES`) and layers it on top of a shared `CORE_PROMPT` — the backstory facts, answering rules, style constraints, and safety override stay identical across all three; only the framing/tone changes. Unknown or missing `mode` falls back to `harvester`.
 
 ## Why it only allows one origin
 
-`api/chat.js` sets `Access-Control-Allow-Origin` to
+`api/chat.js` and `api/tts.js` set `Access-Control-Allow-Origin` to
 `https://rebelwithoutacause.github.io` so only the Dark-ELIZA page can
 call it — this stops other sites from riding on the same free Gemini
 quota.
